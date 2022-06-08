@@ -1,0 +1,11 @@
+{
+	"name": "Skip to Recipe",
+	"description": "Skip all those annoying blogs and stories and go straight to the recipes every time.",
+	"version": "0.0.1",
+	"manifest_version": 3,
+	"background": {
+		"service_worker": "background.js"
+	},
+	"permissions": ["tabs", "scripting"],
+	"host_permissions": ["<all_urls>"]
+}
