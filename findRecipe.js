@@ -1,57 +1,74 @@
 /**
- * Will check the page for an id attribute containing the term "ingredients"
- *
- * Confirmed Success:
- * https://www.simplyrecipes.com/
- * https://www.foodnetwork.com/
- *
- * @returns {HTMLElement}
+ * Websites that the standard class/id search for ingredients does not work for.
  */
-const idContainsIngredients = () => {
-	const ingredients =
-		document.querySelector(`section[id*="ingredients"]`) ||
-		document.querySelector(`section[id*="Ingredients"]`) ||
-		document.querySelector(`section[id*="INGREDIENTS"]`) ||
-		null;
-	if (ingredients)
-		console.log("Recipe found at element with id: " + ingredients.id);
-	return ingredients;
+const exceptions = {
+	"https://www.epicurious.com/": () =>
+		findElementWithAttribute("data-testid", "ingredients"),
+	"https://www.aspicyperspective.com/": () =>
+		findElementWithAttribute("id", "recipe-container"),
+	"https://www.the-girl-who-ate-everything.com/": () =>
+		findElementWithAttribute("id", "wprm-recipe"),
 };
 
 /**
- * Will check the page for a class attribute containing the term "ingredients"
- *
- * Confirmed Success:
- * https://www.allrecipes.com/
- * https://www.gimmesomeoven.com/
- * https://www.delish.com/
- * https://cooking.nytimes.com/
- * https://natashaskitchen.com/
- * https://www.pillsbury.com/
- *
- * @returns {HTMLElement}
+ * Checks if the current page is among the exceptions list and returns the correct element for that page.
+ * @returns The element if the current page is among the exceptions, otherwise null.
  */
-const classContainsIngredients = () => {
-	const ingredients =
-		document.querySelector(`[class*="ingredients"]`) ||
-		document.querySelector(`[class*="Ingredients"]`) ||
-		document.querySelector(`[class*="INGREDIENTS"]`) ||
+const findElementWithException = () => {
+	const href = window.location.href;
+	for (let i in exceptions) {
+		if (href.startsWith(i)) {
+			return exceptions[i]();
+		}
+	}
+	return null;
+};
+
+/**
+ * Search the document for an element with the given attribute that contains the given value.
+ *
+ * @param {string} attribute
+ * @param {string} value
+ * @returns The first element found with the given attribute that contains the given value.
+ */
+const findElementWithAttribute = (attribute, value) => {
+	const valueVariants = [
+		value,
+		value.toLowerCase(),
+		value.toUpperCase(),
+		value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
+	];
+
+	for (let i of valueVariants) {
+		const element =
+			document.querySelector(`[${attribute}*="${i}"]`) || null;
+		if (element) {
+			console.log(
+				`Skip to Recipe: Recipe found at element with ${attribute}: ${element.getAttribute(
+					attribute
+				)}`
+			);
+			return element;
+		}
+	}
+
+	return null;
+};
+
+const scrollToRecipe = () => {
+	const targetElement =
+		findElementWithException() ||
+		findElementWithAttribute("class", "ingredients") ||
+		findElementWithAttribute("id", "ingredients") ||
 		null;
-	if (ingredients)
-		console.log(
-			"Recipe found at element with class: " + ingredients.className
-		);
-	return ingredients;
+
+	if (targetElement) {
+		targetElement.scrollIntoView({
+			block: "start",
+			behavior: "smooth",
+			alignToTop: true,
+		});
+	}
 };
 
-const findIngredients = () => {
-	const ingredients = idContainsIngredients() || classContainsIngredients();
-
-	return ingredients;
-};
-
-const ingredients = findIngredients();
-
-if (ingredients) {
-	ingredients.scrollIntoView({ block: "start" });
-}
+scrollToRecipe();
