@@ -1,24 +1,24 @@
 /**
  * Websites that the standard class/id search for ingredients does not work for.
  */
-const exceptions = {
+const cookingWebsiteExceptions = {
 	"https://www.epicurious.com/": () =>
-		findElementWithAttribute("data-testid", "ingredients"),
+		findRecipeElementWithAttribute("data-testid", "ingredients"),
 	"https://www.aspicyperspective.com/": () =>
-		findElementWithAttribute("id", "recipe-container"),
+		findRecipeElementWithAttribute("id", "recipe-container"),
 	"https://www.the-girl-who-ate-everything.com/": () =>
-		findElementWithAttribute("id", "wprm-recipe"),
+		findRecipeElementWithAttribute("id", "wprm-recipe"),
 };
 
 /**
  * Checks if the current page is among the exceptions list and returns the correct element for that page.
  * @returns The element if the current page is among the exceptions, otherwise null.
  */
-const findElementWithException = () => {
+const findRecipeElementWithException = () => {
 	const href = window.location.href;
-	for (let i in exceptions) {
+	for (let i in cookingWebsiteExceptions) {
 		if (href.startsWith(i)) {
-			return exceptions[i]();
+			return cookingWebsiteExceptions[i]();
 		}
 	}
 	return null;
@@ -31,7 +31,7 @@ const findElementWithException = () => {
  * @param {string} value
  * @returns The first element found with the given attribute that contains the given value.
  */
-const findElementWithAttribute = (attribute, value) => {
+const findRecipeElementWithAttribute = (attribute, value) => {
 	const valueVariants = [
 		value,
 		value.toLowerCase(),
@@ -57,9 +57,9 @@ const findElementWithAttribute = (attribute, value) => {
 
 const scrollToRecipe = () => {
 	const targetElement =
-		findElementWithException() ||
-		findElementWithAttribute("class", "ingredients") ||
-		findElementWithAttribute("id", "ingredients") ||
+		findRecipeElementWithException() ||
+		findRecipeElementWithAttribute("class", "ingredients") ||
+		findRecipeElementWithAttribute("id", "ingredients") ||
 		null;
 
 	if (targetElement) {
